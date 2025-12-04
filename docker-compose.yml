@@ -1,0 +1,103 @@
+services:
+  # ============================================
+  # Backend Service - FileTrace API Server
+  # ============================================
+  backend:
+    # Build configuration
+    build:
+      context: .                    # Build context is project root
+      dockerfile: Dockerfile        # Use the Dockerfile in root
+
+    # Container configuration
+    container_name: filetrace-backend
+    image: filetrace-backend:latest
+    restart: unless-stopped         # Auto-restart unless manually stopped
+
+    # Port mapping: host:container
+    ports:
+      - "3001:3001"
+
+    # Environment variables
+    # All secrets are loaded from server/.env file
+    # IMPORTANT: Create server/.env with actual credentials before running
+    env_file:
+      - server/.env
+
+    # Override/add production-specific settings
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+
+    # Health check (inherits from Dockerfile HEALTHCHECK)
+    # Verifies:
+    # - Server is responding on /health endpoint
+    # - MongoDB Atlas connection is active
+    # - AWS S3 bucket is accessible
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/health', (r) => { let data = ''; r.on('data', chunk => data += chunk); r.on('end', () => { try { const health = JSON.parse(data); process.exit(health.status === 'healthy' ? 0 : 1); } catch(e) { process.exit(1); } }); }).on('error', () => process.exit(1));"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+    # Networking
+    networks:
+      - filetrace-network
+
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# ============================================
+# Networks
+# ============================================
+networks:
+  filetrace-network:
+    driver: bridge
+    name: filetrace-network
+
+# ============================================
+# USAGE INSTRUCTIONS
+# ============================================
+#
+# Prerequisites:
+# 1. Ensure server/.env exists with all required variables:
+#    - MONGODB_URI (MongoDB Atlas connection string)
+#    - DB_NAME, JWT_SECRET
+#    - AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, S3_BUCKET_NAME
+#    - CLIENT_URL (optional, defaults to http://localhost:5173)
+#
+# 2. Verify MongoDB Atlas:
+#    - Cluster is running and accessible
+#    - IP whitelist includes your IP or 0.0.0.0/0
+#    - Database user has read/write permissions
+#
+# 3. Verify AWS S3:
+#    - Bucket exists and is accessible
+#    - IAM user has s3:PutObject, s3:GetObject, s3:DeleteObject permissions
+#    - Server-side encryption is enabled (AES256)
+#
+# Commands:
+#   docker-compose up -d           # Start container in background
+#   docker-compose up              # Start with logs in foreground
+#   docker-compose down            # Stop and remove container
+#   docker-compose logs -f         # Follow logs
+#   docker-compose ps              # Check container status
+#   docker-compose exec backend sh # Shell into container
+#   docker-compose restart backend # Restart container
+#
+# Testing:
+#   curl http://localhost:3001/health  # Check health endpoint
+#
+# The health endpoint will return:
+# {
+#   "status": "healthy",
+#   "timestamp": "2025-11-20T...",
+#   "services": {
+#     "database": "connected",    // MongoDB Atlas status
+#     "storage": "connected"      // AWS S3 status
+#   }
+# }
