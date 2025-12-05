@@ -17,15 +17,15 @@ const createShareLinkSchema = z
   .object({
     fileId: objectIdSchema,
     ownerId: objectIdSchema,
-    expirationHours: nonNegativeIntSchema.optional(),
+    expirationMinutes: nonNegativeIntSchema.optional(),
     maxAccessCount: positiveIntSchema.optional(),
   })
   .refine(
     (data) =>
-      data.expirationHours !== undefined || data.maxAccessCount !== undefined,
+      data.expirationMinutes !== undefined || data.maxAccessCount !== undefined,
     {
       message:
-        'At least one expiration method (expirationHours or maxAccessCount) is required',
+        'At least one expiration method (expirationMinutes or maxAccessCount) is required',
     }
   );
 

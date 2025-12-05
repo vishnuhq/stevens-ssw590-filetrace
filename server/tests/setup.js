@@ -1,15 +1,16 @@
 import { beforeAll, afterAll, beforeEach, vi } from 'vitest';
-import { config } from 'dotenv';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { connectToDb, closeConnection, getDb } from '../config/index.js';
 
-// Load test environment variables
-config({ path: '.env.test' });
-
 let mongoServer;
 
-// Check if running in CI/CD environment (no .env.test with real Atlas URI)
-const useInMemoryDB = !process.env.MONGODB_URI || process.env.CI === 'true';
+// Warn if someone has MONGODB_URI set (we ignore it for safety)
+if (process.env.MONGODB_URI) {
+  console.warn(
+    'WARNING: MONGODB_URI environment variable detected but ignored.',
+    'Tests ALWAYS use MongoDB Memory Server for isolation and security.'
+  );
+}
 
 /**
  * Mock AWS S3 operations for testing
@@ -30,20 +31,14 @@ vi.mock('../utils/s3.js', () => ({
 
 /**
  * Connect to test database before all tests
- * Uses MongoDB Memory Server in CI/CD, or real Atlas DB for local development
+ * ALWAYS uses MongoDB Memory Server for isolation and security
  */
 beforeAll(async () => {
-  if (useInMemoryDB) {
-    // Start in-memory MongoDB server for CI/CD
-    mongoServer = await MongoMemoryServer.create();
-    process.env.MONGODB_URI = mongoServer.getUri();
-    process.env.DB_NAME = 'filetrace-test';
-    console.log('Connected to in-memory test database (CI/CD mode)');
-  } else {
-    // Use MongoDB Atlas for local development testing
-    process.env.DB_NAME = process.env.DB_NAME || 'filetrace-test';
-    console.log('Connected to MongoDB Atlas test database (local mode)');
-  }
+  // Start in-memory MongoDB server (always used)
+  mongoServer = await MongoMemoryServer.create();
+  process.env.MONGODB_URI = mongoServer.getUri();
+  process.env.DB_NAME = 'filetrace-test';
+  console.log('Using MongoDB Memory Server (in-memory test database)');
 
   await connectToDb();
 });
@@ -66,11 +61,6 @@ beforeEach(async () => {
  */
 afterAll(async () => {
   await closeConnection();
-
-  if (mongoServer) {
-    await mongoServer.stop();
-    console.log('Stopped in-memory test database');
-  } else {
-    console.log('Closed test database connection');
-  }
+  await mongoServer.stop();
+  console.log('Stopped MongoDB Memory Server');
 });

@@ -114,7 +114,7 @@ describe('Share Routes', () => {
             fileId: testFileId,
             shareType: 'user',
             recipientIdentifier: 'otheruser',
-            expirationHours: 24,
+            expirationMinutes: 1440,
             maxAccessCount: 5,
           });
 
@@ -136,7 +136,7 @@ describe('Share Routes', () => {
             fileId: testFileId,
             shareType: 'user',
             recipientIdentifier: 'other@example.com',
-            expirationHours: 48,
+            expirationMinutes: 2880,
           });
 
         expect(response.status).toBe(201);
@@ -168,7 +168,7 @@ describe('Share Routes', () => {
             fileId: testFileId,
             shareType: 'user',
             recipientIdentifier: 'nonexistent@example.com',
-            expirationHours: 24,
+            expirationMinutes: 1440,
           });
 
         expect(response.status).toBe(404);
@@ -184,7 +184,7 @@ describe('Share Routes', () => {
           .send({
             fileId: testFileId,
             shareType: 'link',
-            expirationHours: 24,
+            expirationMinutes: 1440,
             maxAccessCount: 3,
           });
 
@@ -206,7 +206,7 @@ describe('Share Routes', () => {
           .send({
             fileId: testFileId,
             shareType: 'link',
-            expirationHours: 72,
+            expirationMinutes: 4320,
           });
 
         expect(response.status).toBe(201);
@@ -257,7 +257,7 @@ describe('Share Routes', () => {
           .send({
             fileId: '507f1f77bcf86cd799439011',
             shareType: 'link',
-            expirationHours: 24,
+            expirationMinutes: 1440,
           });
 
         expect(response.status).toBe(404);
@@ -271,7 +271,7 @@ describe('Share Routes', () => {
           .send({
             fileId: testFileId,
             shareType: 'link',
-            expirationHours: 24,
+            expirationMinutes: 1440,
           });
 
         expect(response.status).toBe(404);
@@ -282,7 +282,7 @@ describe('Share Routes', () => {
         const response = await request(app).post('/api/share/create').send({
           fileId: testFileId,
           shareType: 'link',
-          expirationHours: 24,
+          expirationMinutes: 1440,
         });
 
         expect(response.status).toBe(401);
@@ -295,7 +295,7 @@ describe('Share Routes', () => {
           .send({
             fileId: testFileId,
             shareType: 'invalid',
-            expirationHours: 24,
+            expirationMinutes: 1440,
           });
 
         expect(response.status).toBe(400);
@@ -309,7 +309,7 @@ describe('Share Routes', () => {
           .send({
             fileId: 'invalid-id',
             shareType: 'link',
-            expirationHours: 24,
+            expirationMinutes: 1440,
           });
 
         expect(response.status).toBe(400);
@@ -329,7 +329,7 @@ describe('Share Routes', () => {
         .send({
           fileId: testFileId,
           shareType: 'link',
-          expirationHours: 24,
+          expirationMinutes: 1440,
           maxAccessCount: 3,
         });
 
@@ -342,39 +342,41 @@ describe('Share Routes', () => {
       expect(response.status).toBe(200);
       expect(response.body.file).toHaveProperty('filename');
       expect(response.body.file.filename).toBe('share-test.pdf');
-      expect(response.body).toHaveProperty('downloadUrl');
-      expect(s3Utils.getDownloadUrl).toHaveBeenCalledTimes(1);
+      // GET endpoint returns file info without download URL
+      // Use POST /api/share/:token/download to get downloadUrl
+      expect(response.body.share).toHaveProperty('maxAccessCount');
     });
 
-    it('should return file info and remaining accesses', async () => {
+    it('should return file info and share metadata', async () => {
       const response = await request(app).get(`/api/share/${shareToken}`);
 
       expect(response.status).toBe(200);
       expect(response.body.file).toHaveProperty('filename');
       expect(response.body.file).toHaveProperty('size');
       expect(response.body.file).toHaveProperty('mimetype');
-      expect(response.body.remainingAccesses).toBe(2); // Started with 3, used 1
-      expect(response.body).toHaveProperty('expiresAt');
+      // Share metadata is in share object
+      expect(response.body.share.maxAccessCount).toBe(3);
+      expect(response.body.share.accessCount).toBe(0); // Not incremented on GET
+      expect(response.body.share).toHaveProperty('expiresAt');
     });
 
-    it('should increment access count on each access', async () => {
-      // First access
+    it('should not increment access count on GET (only on download)', async () => {
+      // GET does NOT increment access count
       await request(app).get(`/api/share/${shareToken}`);
-      const firstResponse = await request(app).get(`/api/share/${shareToken}`);
-      expect(firstResponse.body.remainingAccesses).toBe(1); // 3 - 2 = 1
+      await request(app).get(`/api/share/${shareToken}`);
 
-      // Second access
-      const secondResponse = await request(app).get(`/api/share/${shareToken}`);
-      expect(secondResponse.body.remainingAccesses).toBe(0); // 3 - 3 = 0
+      const response = await request(app).get(`/api/share/${shareToken}`);
+      // Access count should still be 0 (GET doesn't increment)
+      expect(response.body.share.accessCount).toBe(0);
     });
 
-    it('should fail for link at max accesses', async () => {
-      // Use up all accesses
-      await request(app).get(`/api/share/${shareToken}`); // 1
-      await request(app).get(`/api/share/${shareToken}`); // 2
-      await request(app).get(`/api/share/${shareToken}`); // 3
+    it('should fail for link at max accesses (using downloads)', async () => {
+      // Use up all accesses via download endpoint
+      await request(app).post(`/api/share/${shareToken}/download`); // 1
+      await request(app).post(`/api/share/${shareToken}/download`); // 2
+      await request(app).post(`/api/share/${shareToken}/download`); // 3
 
-      // Try to access again
+      // Try to access again - should fail
       const response = await request(app).get(`/api/share/${shareToken}`);
 
       expect(response.status).toBe(403);
@@ -413,7 +415,8 @@ describe('Share Routes', () => {
       const response = await request(app).get(`/api/share/${shareToken}`);
 
       expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty('downloadUrl');
+      expect(response.body).toHaveProperty('file');
+      expect(response.body).toHaveProperty('share');
     });
   });
 
@@ -427,7 +430,7 @@ describe('Share Routes', () => {
           fileId: testFileId,
           shareType: 'user',
           recipientIdentifier: 'otheruser',
-          expirationHours: 24,
+          expirationMinutes: 1440,
         });
     });
 

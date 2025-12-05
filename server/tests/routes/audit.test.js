@@ -114,6 +114,9 @@ describe('Audit Routes', () => {
     });
 
     it('should get audit logs for owned file with logs', async () => {
+      // Wait for async audit logs to be written (middleware is fire-and-forget)
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
       const response = await request(app)
         .get(`/api/audit/file/${testFileId}`)
         .set('Authorization', `Bearer ${authToken}`);

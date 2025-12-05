@@ -35,7 +35,7 @@ describe('ShareLinks Data Layer', () => {
       const shareLinkData = {
         fileId: testFileId,
         ownerId: testUserId,
-        expirationHours: 24,
+        expirationMinutes: 1440, // 24 hours in minutes
       };
 
       const result = await shareLinksData.createShareLink(shareLinkData);
@@ -70,7 +70,7 @@ describe('ShareLinks Data Layer', () => {
       const shareLinkData = {
         fileId: testFileId,
         ownerId: testUserId,
-        expirationHours: 48,
+        expirationMinutes: 2880, // 48 hours in minutes
         maxAccessCount: 10,
       };
 
@@ -95,7 +95,7 @@ describe('ShareLinks Data Layer', () => {
       const shareLinkData = {
         fileId: 'invalid-id',
         ownerId: testUserId,
-        expirationHours: 24,
+        expirationMinutes: 1440,
       };
 
       await expect(
@@ -107,7 +107,7 @@ describe('ShareLinks Data Layer', () => {
       const shareLinkData = {
         fileId: testFileId,
         ownerId: testUserId,
-        expirationHours: -5,
+        expirationMinutes: -5,
       };
 
       await expect(
@@ -119,13 +119,13 @@ describe('ShareLinks Data Layer', () => {
       const share1 = await shareLinksData.createShareLink({
         fileId: testFileId,
         ownerId: testUserId,
-        expirationHours: 24,
+        expirationMinutes: 1440,
       });
 
       const share2 = await shareLinksData.createShareLink({
         fileId: testFileId,
         ownerId: testUserId,
-        expirationHours: 24,
+        expirationMinutes: 1440,
       });
 
       expect(share1.token).not.toBe(share2.token);
@@ -137,7 +137,7 @@ describe('ShareLinks Data Layer', () => {
       const created = await shareLinksData.createShareLink({
         fileId: testFileId,
         ownerId: testUserId,
-        expirationHours: 24,
+        expirationMinutes: 1440,
       });
 
       const shareLink = await shareLinksData.getShareLinkByToken(created.token);
@@ -165,7 +165,7 @@ describe('ShareLinks Data Layer', () => {
       const created = await shareLinksData.createShareLink({
         fileId: testFileId,
         ownerId: testUserId,
-        expirationHours: 24,
+        expirationMinutes: 1440,
       });
 
       const isValid = await shareLinksData.validateShareLink(created.token);
@@ -187,7 +187,7 @@ describe('ShareLinks Data Layer', () => {
       const created = await shareLinksData.createShareLink({
         fileId: testFileId,
         ownerId: testUserId,
-        expirationHours: 1,
+        expirationMinutes: 60,
       });
 
       // Manually update expiration to past
@@ -230,7 +230,7 @@ describe('ShareLinks Data Layer', () => {
       const created = await shareLinksData.createShareLink({
         fileId: testFileId,
         ownerId: testUserId,
-        expirationHours: 24,
+        expirationMinutes: 1440,
       });
 
       // Deactivate the link
@@ -253,7 +253,7 @@ describe('ShareLinks Data Layer', () => {
       const created = await shareLinksData.createShareLink({
         fileId: testFileId,
         ownerId: testUserId,
-        expirationHours: 24,
+        expirationMinutes: 1440,
       });
 
       await shareLinksData.incrementShareAccess(created.token);
@@ -267,7 +267,7 @@ describe('ShareLinks Data Layer', () => {
       const created = await shareLinksData.createShareLink({
         fileId: testFileId,
         ownerId: testUserId,
-        expirationHours: 24,
+        expirationMinutes: 1440,
       });
 
       await new Promise((resolve) => setTimeout(resolve, 10));
@@ -291,7 +291,7 @@ describe('ShareLinks Data Layer', () => {
       await shareLinksData.createShareLink({
         fileId: testFileId,
         ownerId: testUserId,
-        expirationHours: 24,
+        expirationMinutes: 1440,
       });
 
       await shareLinksData.createShareLink({
@@ -337,7 +337,7 @@ describe('ShareLinks Data Layer', () => {
       const created = await shareLinksData.createShareLink({
         fileId: testFileId,
         ownerId: testUserId,
-        expirationHours: 24,
+        expirationMinutes: 1440,
       });
 
       const result = await shareLinksData.deactivateShareLink(created.token);
