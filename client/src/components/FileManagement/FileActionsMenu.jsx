@@ -225,6 +225,7 @@ export default function FileActionsMenu({ file, onAction }) {
       {isOpen && (
         <FloatingPortal>
           <div
+            // eslint-disable-next-line react-hooks/refs -- refs.setFloating is a callback ref from @floating-ui/react
             ref={refs.setFloating}
             style={floatingStyles}
             className="w-56 bg-white rounded-lg shadow-lg border border-border-primary z-[9999] py-1 focus:outline-none"

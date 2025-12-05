@@ -22,7 +22,7 @@ import RenameModal from '../components/FileManagement/RenameModal';
 import FileActionsMenu from '../components/FileManagement/FileActionsMenu';
 import FileInformationModal from '../components/FileManagement/FileInformationModal';
 import { fileAPI } from '../utils/api';
-import { formatFileSize, formatDate, formatRelativeTime } from '../utils/auth';
+import { formatFileSize, formatRelativeTime } from '../utils/auth';
 
 /**
  * Truncate filename in the middle to show beginning and end
@@ -234,7 +234,7 @@ export default function FilesList() {
   /**
    * Format activity action to readable text
    */
-  const formatActivityText = (action) => {
+  const _formatActivityText = (action) => {
     const actionMap = {
       UPLOAD: 'Uploaded',
       DOWNLOAD: 'Downloaded',
@@ -381,16 +381,15 @@ export default function FilesList() {
       await fileAPI.deleteFile(file._id);
       toast.success('File deleted successfully');
       loadFiles(); // Reload files
-    } catch (error) {
+    } catch {
       toast.error('Failed to delete file');
     }
   };
 
   /**
    * Handle file move success
-   * @param {string} newCategory - The category the file was moved to
    */
-  const handleMoveSuccess = (newCategory) => {
+  const handleMoveSuccess = () => {
     // If file was moved out of current category, reload files
     // This will remove it from the current view
     loadFiles();

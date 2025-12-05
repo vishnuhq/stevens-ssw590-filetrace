@@ -141,7 +141,7 @@ export default function AuditLogs() {
   /**
    * Handle sort toggle
    */
-  const handleSortToggle = () => {
+  const _handleSortToggle = () => {
     setSortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'));
   };
 

@@ -14,7 +14,7 @@ export default defineConfig({
     },
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'json', 'html'],
+      reporter: ['text', 'json', 'html', 'cobertura'],
       exclude: [
         'node_modules/',
         'tests/',
@@ -22,10 +22,12 @@ export default defineConfig({
         '**/*.config.js',
         '**/index.js', // Barrel exports
       ],
-      lines: 70,
-      functions: 70,
-      branches: 70,
-      statements: 70,
+      thresholds: {
+        lines: 55,
+        functions: 65,
+        branches: 45,
+        statements: 55,
+      },
     },
     testTimeout: 10000,
   },

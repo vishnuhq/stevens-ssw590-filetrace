@@ -19,20 +19,18 @@ import DeleteAccountModal from '../components/UserProfile/DeleteAccountModal';
  */
 export default function UserProfile() {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  // Initialize with user data from localStorage
+  const [user, setUser] = useState(() => getUser());
   const [showEditModal, setShowEditModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  // Load user data on mount
+  // Redirect to login if not authenticated
   useEffect(() => {
-    const userData = getUser();
-    if (!userData) {
+    if (!user) {
       navigate('/login');
-      return;
     }
-    setUser(userData);
-  }, [navigate]);
+  }, [user, navigate]);
 
   /**
    * Handle successful profile update
@@ -48,7 +46,7 @@ export default function UserProfile() {
    * Handle successful password change
    * Note: Modal now handles logout and redirect itself after server confirms
    */
-  const handlePasswordChange = () => {
+  const _handlePasswordChange = () => {
     // Modal handles everything - this is just a placeholder
     // The modal will close itself, logout, and redirect after server success
   };
@@ -57,7 +55,7 @@ export default function UserProfile() {
    * Handle successful account deletion
    * Note: Modal now handles logout and redirect itself after server confirms
    */
-  const handleAccountDeleted = () => {
+  const _handleAccountDeleted = () => {
     // Modal handles everything - this is just a placeholder
     // The modal will close itself, logout, and redirect after server success
   };

@@ -10,7 +10,6 @@ import { toast } from 'sonner';
 import Navbar from '../components/layout/Navbar';
 import { fileAPI } from '../utils/api';
 import { renameFileSchema, extractValidationErrors } from '../utils/validation';
-import { formatDate } from '../utils/auth';
 
 /**
  * RenameFile Component
