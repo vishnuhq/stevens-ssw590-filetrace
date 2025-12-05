@@ -10,12 +10,7 @@ import { Download, Users, Loader2, X } from 'lucide-react';
 import Navbar from '../components/layout/Navbar';
 import SharedFileDetailsModal from '../components/ShareManagement/SharedFileDetailsModal';
 import { shareAPI, fileAPI, getErrorMessage } from '../utils/api';
-import {
-  formatFileSize,
-  formatRelativeTime,
-  formatDate,
-  getUser,
-} from '../utils/auth';
+import { formatFileSize, formatDate, getUser } from '../utils/auth';
 import { toast } from 'sonner';
 
 /**

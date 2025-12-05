@@ -38,6 +38,8 @@ beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
   process.env.MONGODB_URI = mongoServer.getUri();
   process.env.DB_NAME = 'filetrace-test';
+  process.env.JWT_SECRET =
+    'test-jwt-secret-for-unit-tests-only-do-not-use-in-production';
   console.log('Using MongoDB Memory Server (in-memory test database)');
 
   await connectToDb();

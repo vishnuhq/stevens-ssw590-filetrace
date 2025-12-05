@@ -301,7 +301,7 @@ export default function ShareFile() {
     setShareCreated(false);
     setShareLink('');
     setRecipientIdentifier('');
-    setExpirationHours('');
+    setExpirationInput('');
     setMaxAccessCount('');
     setCopied(false);
   };
