@@ -6,6 +6,9 @@ FROM node:24-alpine AS build
 # Set working directory
 WORKDIR /app
 
+# Update npm to fix glob CVE-2025-64756 (vulnerable versions 10.4.5, 11.0.3 in base image)
+RUN npm install -g npm@latest
+
 # Copy package files for dependency installation
 # Copy only package files first to leverage Docker layer caching
 COPY server/package*.json ./
