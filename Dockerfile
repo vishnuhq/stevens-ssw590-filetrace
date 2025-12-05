@@ -30,6 +30,10 @@ FROM node:24-alpine
 # This ensures graceful shutdown and proper cleanup
 RUN apk add --no-cache dumb-init
 
+# Remove npm to fix CVE-2025-64756 (glob vulnerability in npm's dependencies)
+# npm is not needed at runtime - we only run 'node server.js'
+RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
+
 # Create non-root user for security (Principle of Least Privilege)
 # Running as root violates security best practices
 # UID/GID 1001 to avoid conflicts with existing system users
