@@ -308,7 +308,7 @@ describe('Files Data Layer', () => {
       const created = await filesData.createFile(fileData);
       const result = await filesData.deleteFile(created._id.toString());
 
-      expect(result.deletedCount).toBe(1);
+      expect(result.file.deletedCount).toBe(1);
 
       // Verify file is deleted
       const deleted = await filesData.getFileById(created._id.toString());
@@ -317,7 +317,7 @@ describe('Files Data Layer', () => {
 
     it('should return 0 deletedCount for non-existent file', async () => {
       const result = await filesData.deleteFile('507f1f77bcf86cd799439011');
-      expect(result.deletedCount).toBe(0);
+      expect(result.file.deletedCount).toBe(0);
     });
 
     it('should throw error with invalid file ID', async () => {
