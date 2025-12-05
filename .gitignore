@@ -50,7 +50,6 @@ lerna-debug.log*
 .yarn/install-state.gz
 
 # Package managers
-package-lock.json
 yarn.lock
 pnpm-lock.yaml
 
