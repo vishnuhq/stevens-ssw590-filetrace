@@ -35,7 +35,7 @@ variables:
 
 install-backend:
   stage: install
-  image: node:24-alpine
+  image: node:24  # Full Debian image - required for bcrypt compilation and MongoDB Memory Server
   extends: .rules_mr_and_main
   cache:
     key: backend-${CI_COMMIT_REF_SLUG}
@@ -73,7 +73,7 @@ install-frontend:
 
 lint-backend:
   stage: lint
-  image: node:24-alpine
+  image: node:24  # Must match install-backend image (full Debian for bcrypt compatibility)
   extends: .rules_mr_and_main
   dependencies:
     - install-backend
@@ -88,7 +88,7 @@ lint-backend:
 
 test-backend:
   stage: test
-  image: node:24-alpine
+  image: node:24  # Full Debian - MongoDB Memory Server requires libcurl (not in slim)
   extends: .rules_mr_and_main
   dependencies:
     - install-backend
@@ -170,6 +170,10 @@ build-docker:
     DOCKER_HOST: tcp://docker:2375
   before_script:
     - apk add --no-cache aws-cli curl
+    # Install Trivy binary directly (NOT as nested docker container)
+    # This allows Trivy to use DOCKER_HOST to access DinD daemon
+    - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+    - trivy --version
     - aws --version
     - |
       aws ecr get-login-password --region $AWS_REGION | \
@@ -183,10 +187,9 @@ build-docker:
       docker tag $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$CI_COMMIT_SHA \
       $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:latest
 
-    - echo "Scanning Docker image with Trivy (STRICT - blocks on HIGH/CRITICAL vulnerabilities and secrets)..."
+    - echo "Scanning Docker image with Trivy (STRICT - blocks on HIGH/CRITICAL)..."
     - |
-      docker run --rm aquasec/trivy:latest image \
-      --exit-code 1 --severity HIGH,CRITICAL \
+      trivy image --exit-code 1 --severity HIGH,CRITICAL \
       --scanners vuln,secret \
       $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$CI_COMMIT_SHA
     # Image MUST pass security scan before push
@@ -205,11 +208,14 @@ deploy-backend:
   stage: deploy
   image: alpine:latest
   extends: .rules_main_only
-  dependencies: []
+  needs:
+    - job: build-docker
+      artifacts: false
   before_script:
     - apk add --no-cache openssh-client aws-cli
     - mkdir -p ~/.ssh
-    - echo "$EC2_SSH_KEY" > ~/.ssh/id_rsa
+    # EC2_SSH_KEY is a File type variable - contains path, not content
+    - cp "$EC2_SSH_KEY" ~/.ssh/id_rsa
     - chmod 600 ~/.ssh/id_rsa
     - ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts 2>/dev/null
   script:
