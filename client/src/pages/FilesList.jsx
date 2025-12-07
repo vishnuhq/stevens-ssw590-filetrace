@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import Navbar from '../components/layout/Navbar';
+import Breadcrumb from '../components/layout/Breadcrumb';
 import ViewSharesModal from '../components/ShareManagement/ViewSharesModal';
 import MoveFileModal from '../components/FileManagement/MoveFileModal';
 import RenameModal from '../components/FileManagement/RenameModal';
@@ -428,6 +429,14 @@ export default function FilesList() {
     <div className="min-h-screen bg-background-secondary">
       <Navbar />
 
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb
+        items={[
+          { label: 'My FileTrace', path: '/dashboard' },
+          { label: category === 'shared-with-me' ? 'Shared to Me' : category },
+        ]}
+      />
+
       <main className="container mx-auto px-4 py-8">
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
@@ -648,39 +657,48 @@ export default function FilesList() {
                       {formatRelativeTime(file.uploadedAt)}
                     </div>
 
-                    {/* Column 4: Action Buttons */}
-                    <div className="flex gap-2 items-center justify-end flex-wrap">
-                      {/* Audit Logs (Primary Blue) - Fixed Width */}
+                    {/* Column 4: Action Buttons - Row on xl+, Column below xl */}
+                    <div className="flex flex-col xl:flex-row gap-2 items-stretch xl:items-center justify-end">
+                      {/* Audit Logs (Primary Blue) */}
                       <button
                         onClick={() => handleAction('auditLogs', file)}
-                        className="btn-primary text-sm h-9 w-36 flex items-center justify-center gap-1"
+                        className="btn-primary text-sm h-9 w-28 flex items-center justify-center gap-1"
                         aria-label={`View audit logs for ${file.filename}`}
                       >
-                        <FileSearch className="w-4 h-4" aria-hidden="true" />
-                        <span className="hidden sm:inline">Audit Logs</span>
+                        <FileSearch
+                          className="w-4 h-4 flex-shrink-0"
+                          aria-hidden="true"
+                        />
+                        <span className="whitespace-nowrap">Audit Logs</span>
                       </button>
 
-                      {/* Share (Outline) - Fixed Width */}
+                      {/* Share (Outline) */}
                       <button
                         onClick={() => handleAction('share', file)}
-                        className="btn-outline text-sm h-9 w-36 flex items-center justify-center gap-1"
+                        className="btn-outline text-sm h-9 w-28 flex items-center justify-center gap-1"
                         aria-label={`Share ${file.filename}`}
                       >
-                        <Share2 className="w-4 h-4" aria-hidden="true" />
-                        <span className="hidden sm:inline">Share</span>
+                        <Share2
+                          className="w-4 h-4 flex-shrink-0"
+                          aria-hidden="true"
+                        />
+                        <span className="whitespace-nowrap">Share</span>
                       </button>
 
-                      {/* Download (Secondary Gray) - Fixed Width */}
+                      {/* Download (Secondary Gray) */}
                       <button
                         onClick={() => handleAction('download', file)}
-                        className="btn-secondary text-sm h-9 w-36 flex items-center justify-center gap-1"
+                        className="btn-secondary text-sm h-9 w-28 flex items-center justify-center gap-1"
                         aria-label={`Download ${file.filename}`}
                       >
-                        <Download className="w-4 h-4" aria-hidden="true" />
-                        <span className="hidden sm:inline">Download</span>
+                        <Download
+                          className="w-4 h-4 flex-shrink-0"
+                          aria-hidden="true"
+                        />
+                        <span className="whitespace-nowrap">Download</span>
                       </button>
 
-                      {/* 3-Dots Menu - Square Button */}
+                      {/* 3-Dots Menu */}
                       <FileActionsMenu file={file} onAction={handleAction} />
                     </div>
                   </div>

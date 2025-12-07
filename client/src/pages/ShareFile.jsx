@@ -7,7 +7,6 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Share2,
-  ArrowLeft,
   Loader2,
   Link as LinkIcon,
   User,
@@ -16,6 +15,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import Navbar from '../components/layout/Navbar';
+import Breadcrumb from '../components/layout/Breadcrumb';
 import { fileAPI, shareAPI } from '../utils/api';
 import { shareSchema, extractValidationErrors } from '../utils/validation';
 import { copyToClipboard } from '../utils/auth';
@@ -332,23 +332,23 @@ export default function ShareFile() {
     <div className="min-h-screen bg-bg-primary">
       <Navbar />
 
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb
+        items={[
+          { label: 'My FileTrace', path: '/dashboard' },
+          { label: file.category, path: `/files/${file.category}` },
+          { label: 'Share' },
+        ]}
+      />
+
       <main className="container mx-auto px-4 py-8 max-w-2xl">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
-          <button
-            onClick={handleCancel}
-            className="btn-secondary flex items-center justify-center w-10 h-10 p-0"
-            aria-label="Go back"
-          >
-            <ArrowLeft className="w-6 h-6" />
-          </button>
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold text-text">Share File</h1>
-            <p className="text-text-secondary mt-1">
-              Share <strong className="text-text">{file.filename}</strong> with
-              others
-            </p>
-          </div>
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-text">Share File</h1>
+          <p className="text-text-secondary mt-1">
+            Share <strong className="text-text">{file.filename}</strong> with
+            others
+          </p>
         </div>
 
         {/* Share Created Success State */}
