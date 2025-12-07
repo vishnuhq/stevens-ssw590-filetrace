@@ -1274,3 +1274,29 @@ button:hover .icon-glow-action {
     background: #fff;
   }
 }
+
+/* ===================================
+   BREADCRUMB NAVIGATION
+   ================================== */
+
+.breadcrumb-container {
+  @apply py-3 px-4;
+  background: var(--color-bg-tertiary);
+  border-bottom: 1px solid var(--color-border-primary);
+}
+
+.breadcrumb-link {
+  color: var(--color-accent-primary);
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.breadcrumb-link:hover {
+  color: var(--color-accent-hover);
+  text-decoration: underline;
+}
+
+.breadcrumb-current {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}

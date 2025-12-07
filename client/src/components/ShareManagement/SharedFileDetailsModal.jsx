@@ -99,11 +99,11 @@ export default function SharedFileDetailsModal({ isOpen, onClose, file }) {
   const handleDownload = async () => {
     try {
       setDownloading(true);
-      const response = await fileAPI.downloadFile(file._id);
-      const url = response.data.url;
+      const response = await fileAPI.getDownloadUrl(file._id);
+      const { downloadUrl } = response.data;
 
-      // Open pre-signed URL in new window
-      window.location.href = url;
+      // Open pre-signed URL in new tab
+      window.open(downloadUrl, '_blank');
 
       toast.success('Download started');
 

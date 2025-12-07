@@ -5,16 +5,10 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import {
-  ArrowLeft,
-  Loader2,
-  FileText,
-  Activity,
-  Info,
-  RotateCcw,
-} from 'lucide-react';
+import { Loader2, FileText, Activity, Info, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 import Navbar from '../components/layout/Navbar';
+import Breadcrumb from '../components/layout/Breadcrumb';
 import AuditLogDetailsModal from '../components/AuditLogs/AuditLogDetailsModal';
 import { fileAPI, auditAPI } from '../utils/api';
 import { formatDate } from '../utils/auth';
@@ -231,23 +225,23 @@ export default function AuditLogs() {
     <div className="min-h-screen bg-bg-primary">
       <Navbar />
 
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb
+        items={[
+          { label: 'My FileTrace', path: '/dashboard' },
+          { label: file.category, path: `/files/${file.category}` },
+          { label: 'Audit Logs' },
+        ]}
+      />
+
       <main className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
-          <button
-            onClick={handleBack}
-            className="btn-secondary flex items-center justify-center w-10 h-10 p-0"
-            aria-label="Go back"
-          >
-            <ArrowLeft className="w-6 h-6" />
-          </button>
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold text-text">Audit Logs</h1>
-            <p className="text-text-secondary mt-1">
-              Complete activity history for{' '}
-              <strong className="text-text">{file.filename}</strong>
-            </p>
-          </div>
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-text">Audit Logs</h1>
+          <p className="text-text-secondary mt-1">
+            Complete activity history for{' '}
+            <strong className="text-text">{file.filename}</strong>
+          </p>
         </div>
 
         {/* File Info Card */}

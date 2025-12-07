@@ -55,7 +55,7 @@ export default function Navbar() {
             <div className="flex items-center gap-3">
               {/* User Greeting */}
               <span
-                className="text-sm text-text-secondary hidden sm:inline"
+                className="text-text-secondary hidden sm:inline"
                 aria-label={`Logged in as ${user.username}`}
               >
                 Welcome,{' '}

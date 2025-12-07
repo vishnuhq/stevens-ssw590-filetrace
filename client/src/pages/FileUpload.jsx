@@ -21,10 +21,10 @@ import {
   X,
   CheckCircle,
   AlertCircle,
-  ArrowLeft,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import Navbar from '../components/layout/Navbar';
+import Breadcrumb from '../components/layout/Breadcrumb';
 import { getToken } from '../utils/auth';
 
 /**
@@ -422,22 +422,19 @@ export default function FileUpload() {
     <div className="min-h-screen bg-bg-primary">
       <Navbar />
 
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb
+        items={[
+          { label: 'My FileTrace', path: '/dashboard' },
+          { label: category, path: `/files/${category}` },
+          { label: 'Upload' },
+        ]}
+      />
+
       <main className="container mx-auto px-4 py-8 max-w-3xl">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
-          <button
-            onClick={() => navigate(`/files/${category}`)}
-            className="btn-secondary flex items-center justify-center w-10 h-10 p-0"
-            aria-label="Go back"
-          >
-            <ArrowLeft className="w-6 h-6" />
-          </button>
-          <div>
-            <h1 className="text-3xl font-bold text-text">Upload Files</h1>
-            <p className="text-text-secondary">
-              Category: <span className="font-semibold">{category}</span>
-            </p>
-          </div>
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-text">Upload Files</h1>
         </div>
 
         {/* Upload Form */}
@@ -461,26 +458,6 @@ export default function FileUpload() {
           >
             <UploadZone category={category} onSuccess={handleSuccess} />
           </Uploady>
-        </div>
-
-        {/* Instructions */}
-        <div className="mt-6 p-4 bg-primary/10 border border-primary/30 rounded-lg">
-          <h3 className="font-semibold text-primary mb-2">
-            Upload Instructions:
-          </h3>
-          <ul className="list-disc list-inside text-sm text-text-secondary space-y-1">
-            <li>Click the upload zone to browse and select a file</li>
-            <li>
-              Enter a description for your file (optional, max 250 characters)
-            </li>
-            <li>Select or change the category if needed</li>
-            <li>Click "Confirm Upload" to start uploading</li>
-            <li>Maximum file size: 10MB</li>
-            <li>
-              Default category:{' '}
-              <strong className="text-text">{category}</strong>
-            </li>
-          </ul>
         </div>
       </main>
     </div>

@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Download, Users, Loader2, X } from 'lucide-react';
 import Navbar from '../components/layout/Navbar';
+import Breadcrumb from '../components/layout/Breadcrumb';
 import SharedFileDetailsModal from '../components/ShareManagement/SharedFileDetailsModal';
 import { shareAPI, fileAPI, getErrorMessage } from '../utils/api';
 import { formatFileSize, formatDate, getUser } from '../utils/auth';
@@ -120,11 +121,11 @@ export default function SharedWithMe() {
    */
   const handleDownload = async (file) => {
     try {
-      const response = await fileAPI.downloadFile(file._id);
-      const url = response.data.url;
+      const response = await fileAPI.getDownloadUrl(file._id);
+      const { downloadUrl } = response.data;
 
-      // Open pre-signed URL in new window
-      window.location.href = url;
+      // Open pre-signed URL in new tab
+      window.open(downloadUrl, '_blank');
 
       toast.success('Download started');
 
@@ -156,6 +157,14 @@ export default function SharedWithMe() {
     <div className="min-h-screen bg-bg-primary">
       {/* Navigation Bar */}
       <Navbar />
+
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb
+        items={[
+          { label: 'My FileTrace', path: '/dashboard' },
+          { label: 'Shared to Me' },
+        ]}
+      />
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8 max-w-7xl" id="main-content">

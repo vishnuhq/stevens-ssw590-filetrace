@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Mail, Calendar, Edit, Lock, Trash2, Shield } from 'lucide-react';
 import Navbar from '../components/layout/Navbar';
+import Breadcrumb from '../components/layout/Breadcrumb';
 import { getUser } from '../utils/auth';
 import { formatRelativeTime } from '../utils/auth';
 import EditProfileModal from '../components/UserProfile/EditProfileModal';
@@ -72,6 +73,14 @@ export default function UserProfile() {
     <div className="min-h-screen bg-bg-primary">
       {/* Navigation Bar */}
       <Navbar />
+
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb
+        items={[
+          { label: 'My FileTrace', path: '/dashboard' },
+          { label: 'Profile' },
+        ]}
+      />
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8 max-w-4xl" id="main-content">
@@ -233,7 +242,7 @@ export default function UserProfile() {
                 </p>
                 <ul className="list-disc list-inside text-sm text-text-secondary mt-2 space-y-1">
                   <li>Your account and profile</li>
-                  <li>All your uploaded files (MongoDB and S3)</li>
+                  <li>All your uploaded files</li>
                   <li>All share links you created</li>
                   <li>All user shares you created</li>
                   <li>All audit logs for your files</li>

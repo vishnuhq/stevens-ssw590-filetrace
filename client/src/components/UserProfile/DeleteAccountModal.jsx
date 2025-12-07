@@ -33,7 +33,6 @@ export default function DeleteAccountModal({ isOpen, onClose, user }) {
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [showDetails, setShowDetails] = useState(false);
 
   // Reset form when modal opens
   useEffect(() => {
@@ -43,7 +42,6 @@ export default function DeleteAccountModal({ isOpen, onClose, user }) {
         confirmation: '',
       });
       setErrors({});
-      setShowDetails(false);
     }
   }, [isOpen]);
 
@@ -84,14 +82,10 @@ export default function DeleteAccountModal({ isOpen, onClose, user }) {
     // Submit to API
     try {
       setLoading(true);
-      const response = await authAPI.deleteAccount(formData);
+      await authAPI.deleteAccount(formData);
 
       // SUCCESS: Server confirmed account deletion
-      // Show detailed deletion results
-      const deletedRecords = response.data.deletedRecords;
-      const message = `Account deleted successfully. Removed: ${deletedRecords.files} files, ${deletedRecords.shareLinks} share links, ${deletedRecords.s3Objects} S3 objects.`;
-
-      toast.success(message, { duration: 5000 });
+      toast.success('Account deleted successfully.', { duration: 5000 });
 
       // Close modal
       onClose();
@@ -204,34 +198,11 @@ export default function DeleteAccountModal({ isOpen, onClose, user }) {
                 </p>
                 <ul className="list-disc list-inside text-sm text-red-800 space-y-1">
                   <li>Your account and profile information</li>
-                  <li>All your uploaded files (MongoDB and AWS S3)</li>
+                  <li>All your uploaded files</li>
                   <li>All share links you created</li>
                   <li>All user shares you created</li>
                   <li>All audit logs for your files</li>
                 </ul>
-                <button
-                  type="button"
-                  onClick={() => setShowDetails(!showDetails)}
-                  className="text-xs text-red-700 underline hover:text-red-900 mt-3"
-                >
-                  {showDetails
-                    ? 'Hide technical details'
-                    : 'Show technical details'}
-                </button>
-                {showDetails && (
-                  <div className="mt-3 p-3 bg-red-100 rounded text-xs text-red-900 font-mono">
-                    <p className="font-bold mb-1">Deletion Process:</p>
-                    <ul className="list-decimal list-inside space-y-0.5">
-                      <li>Verify password</li>
-                      <li>Delete all files from AWS S3 (irreversible)</li>
-                      <li>Delete files from MongoDB</li>
-                      <li>Delete share links and user shares</li>
-                      <li>Delete audit logs for your files</li>
-                      <li>Anonymize logs for other users' files</li>
-                      <li>Delete user account</li>
-                    </ul>
-                  </div>
-                )}
               </div>
             </div>
           </div>
