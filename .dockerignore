@@ -72,6 +72,7 @@ server/.gitignore
 **/*.md
 server/*.md
 docs/
+images/
 CHANGELOG*
 LICENSE*
 CONTRIBUTING*

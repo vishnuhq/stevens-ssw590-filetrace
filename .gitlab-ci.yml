@@ -2,6 +2,16 @@
 # Triggers on push to main branch and merge requests
 # MR: Tests + Security only (no secrets needed - uses mocks)
 # Merge to main: Full pipeline with deployment
+#
+# ============================================
+# CI/CD DISABLED - AWS free tier credits expired
+# Infrastructure has been decommissioned as of December 2025
+# To re-enable: remove the workflow rules below
+# ============================================
+
+workflow:
+  rules:
+    - when: never # CI/CD disabled - AWS infrastructure decommissioned
 
 stages:
   - install
