@@ -15,6 +15,8 @@ Full-stack file management platform for secure file storage, sharing, and detail
 9. [Tech Stack](#tech-stack)
 10. [Local Development](#local-development)
 11. [Academic Context](#academic-context)
+12. [Project Links](#project-links)
+13. [Documentation](#documentation)
 
 ## About
 
